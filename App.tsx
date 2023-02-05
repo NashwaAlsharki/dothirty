@@ -1,87 +1,80 @@
-import React from "react";
-import {
-  Text,
-  Link,
-  HStack,
-  Center,
-  Heading,
-  Switch,
-  useColorMode,
-  NativeBaseProvider,
-  extendTheme,
-  VStack,
-  Box,
-} from "native-base";
-import NativeBaseIcon from "./components/NativeBaseIcon";
+import * as React from "react";
+import { NativeBaseProvider } from "native-base";
 
-// Define the config
-const config = {
-  useSystemColorMode: false,
-  initialColorMode: "dark",
-};
+// navigation imports
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// extend the theme
-export const theme = extendTheme({ config });
-type MyThemeType = typeof theme;
-declare module "native-base" {
-  interface ICustomTheme extends MyThemeType {}
-}
+// screen imports
+import PlanTab from './screens/tabs/PlanTab';
+import BrowseTab from './screens/tabs/BrowseTab';
+import ProfileTab from './screens/tabs/ProfileTab';
+import StartScreen from './screens/StartScreen';
+import LogInModal from './screens/modals/LogInModal';
+import SignUpModal from './screens/modals/SignUpModal';
+import ChallengeScreen from './screens/ChallengeScreen';
+import DayScreen from './screens/DayScreen';
+import DetailModal from './screens/modals/DetailModal';
+import FilterModal from './screens/modals/FilterModal';
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
 export default function App() {
   return (
     <NativeBaseProvider>
-      <Center
-        _dark={{ bg: "blueGray.900" }}
-        _light={{ bg: "blueGray.50" }}
-        px={4}
-        flex={1}
-      >
-        <VStack space={5} alignItems="center">
-          <NativeBaseIcon />
-          <Heading size="lg">Welcome to NativeBase</Heading>
-          <HStack space={2} alignItems="center">
-            <Text>Edit</Text>
-            <Box
-              _web={{
-                _text: {
-                  fontFamily: "monospace",
-                  fontSize: "sm",
-                },
-              }}
-              px={2}
-              py={1}
-              _dark={{ bg: "blueGray.800" }}
-              _light={{ bg: "blueGray.200" }}
-            >
-              App.js
-            </Box>
-            <Text>and save to reload.</Text>
-          </HStack>
-          <Link href="https://docs.nativebase.io" isExternal>
-            <Text color="primary.500" underline fontSize={"xl"}>
-              Learn NativeBase
-            </Text>
-          </Link>
-          <ToggleDarkMode />
-        </VStack>
-      </Center>
+      <NavigationContainer>
+        <StackNav />
+      </NavigationContainer>
     </NativeBaseProvider>
   );
 }
 
-// Color Switch Component
-function ToggleDarkMode() {
-  const { colorMode, toggleColorMode } = useColorMode();
+const Stack = createNativeStackNavigator();
+function StackNav() {
   return (
-    <HStack space={2} alignItems="center">
-      <Text>Dark</Text>
-      <Switch
-        isChecked={colorMode === "light"}
-        onToggle={toggleColorMode}
-        aria-label={
-          colorMode === "light" ? "switch to dark mode" : "switch to light mode"
-        }
-      />
-      <Text>Light</Text>
-    </HStack>
+    <Stack.Navigator initialRouteName='StartScreen'>
+
+      <Stack.Group screenOptions={{ headerShown: true }}>
+        <Stack.Screen name="StartScreen" component={StartScreen} />
+        <Stack.Screen name="Plan" component={PlanTab} />
+        <Stack.Screen name="Browse" component={BrowseTab} />
+        <Stack.Screen name="Profile" component={ProfileTab} options={{ title: 'Profile' }} />
+      </Stack.Group>
+
+      <Stack.Screen name="Challenge" component={ChallengeScreen} options={{ title: 'Challenge' }} />
+      <Stack.Screen name="Day" component={DayScreen} options={{ title: 'Day' }} />
+
+
+      <Stack.Group screenOptions={{ presentation: 'modal' }}>
+          <Stack.Screen name="Filter" component={FilterModal} />
+          <Stack.Screen name="Detail" component={DetailModal} />
+          <Stack.Screen name="LogIn" component={LogInModal} options={{ title: 'Log In' }} />
+        <Stack.Screen name="SignUp" component={SignUpModal} options={{ title: 'Sign Up' }} />
+      </Stack.Group>
+
+    </Stack.Navigator>
   );
-}
+  }
+
+const Tab = createBottomTabNavigator();
+function TabNav() {
+  return (
+    <Tab.Navigator initialRouteName="Plan">
+        <Tab.Screen
+            name="Plan"
+            component={PlanTab}
+            options={{title: 'Plan'}}
+        />
+        <Tab.Screen
+            name="Browse"
+            component={BrowseTab}
+            options={{title: 'Challenges'}}
+        />
+        <Tab.Screen
+            name="Profile"
+            component={ProfileTab}
+            options={{title: 'Profile'}}
+        />
+    </Tab.Navigator>
+  );
+  }
